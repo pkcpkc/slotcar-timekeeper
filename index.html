@@ -51,11 +51,12 @@
         }
 
         function getAverageRGBBlock(imageData, blockSize) {
+            const RGBA_ARRAY_LENGTH = 4;
             let length = imageData.data.length;
             let data = imageData.data;
             var count = 0;
             var rgb = [0, 0, 0];
-            for (var i = 0; i < length; i += blockSize * 4) {
+            for (var i = 0; i < length; i += blockSize * RGBA_ARRAY_LENGTH) {
                 count++;
                 rgb[0] += data[i];
                 rgb[1] += data[i + 1];

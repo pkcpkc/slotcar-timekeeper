@@ -6,13 +6,17 @@
 <style>
     canvas {
         width: 100%;
-        height: 240px;
+        height: 50%;
+    }
+    video {
+        width: 100%;
+        height: 50%;
     }
 </style>
 
 <body>
-    <video id="video" width="100%" height="240" autoplay playsinline></video><br />
-    <canvas id="canvas" width="100%" height="240"></canvas><br />
+    <video id="video" autoplay playsinline></video><br />
+    <canvas id="canvas"></canvas><br />
     <input type="button" id="reset" value="Reset" onclick="reset();" /><br />
     <div id="log"></div>
     <script>
@@ -40,6 +44,7 @@
             video.srcObject = await navigator.mediaDevices.getUserMedia({
                 audio: false,
                 video: {
+                    facingMode: 'environment',
                     width: width,
                     height: height,
                     deviceId: navigator.mediaDevices.enumerateDevices()[0]

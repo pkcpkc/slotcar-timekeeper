@@ -8,46 +8,51 @@
 </head>
 
 <body>
-    <canvas id="canvas"></canvas><br />
-    <video id="video" autoplay playsinline></video>
-    <ol>
-        <li><input type="button" onclick="startVideo();event.target.style.color='#aaaaaa';" value="Start video" /> and
-            allow video capturing</li>
-        <li>Position phone on top of track and capture slot cars in red detection rectangles using:
-            <ul>
-                <li>
-                    <h3>Width: <output></output></h3>
-                    <input type="range" id="detectionWidth" min="1" max="10" value="5" />
-                </li>
-                <li>
-                    <h3>Height: <output></output></h3>
-                    <input type="range" id="detectionHeight" min="1" max="10" value="5" />
-                </li>
-                <li>
-                    <h3>Distance: <output></output></h3>
-                    <input type="range" id="detectionDistance" min="1" max="10" value="5" />
-                </li>
-            </ul>
-        </li>
-        <li>Remove slot cars from track</li>
-        <li><input type="button" id="captureDefault" value="Capture default"
-                onclick="captureDefault=true;event.target.style.color='#aaaaaa';" /> colors
-            without slot cars</li>
-        <li>Move cars into red detection rectangle and check if rectangle changes color to green. You may want
-            to adjust:
-            <ul>
-                <li>
-                    <h3>Color Treshold: <output></output></h3>
-                    <input type="range" id="colorThreshold" min="1" max="255" value="40" />
-                </li>
-                <li>
-                    <h3>Block size: <output></output></h3>
-                    <input type="range" name="blockSize" min="1" max="10" value="5" />
-                </li>
-            </ul>
-        </li>
-        <li><input type="button" id="startRace" value="Start race" onclick="start();" /> to start timekeeping!</li>
-    </ol>
+    <div id="settingsScreen">
+        <canvas id="canvas"></canvas><br />
+        <ol>
+            <li><input type="button" onclick="startVideo();event.target.style.color='#aaaaaa';" value="Start video" />
+                and
+                allow video capturing</li>
+            <li>Position phone on top of track and capture slot cars in red detection rectangles using:
+                <ul>
+                    <li>
+                        <h3>Width: <output></output></h3>
+                        <input type="range" id="detectionWidth" min="1" max="10" value="5" />
+                    </li>
+                    <li>
+                        <h3>Height: <output></output></h3>
+                        <input type="range" id="detectionHeight" min="1" max="10" value="5" />
+                    </li>
+                    <li>
+                        <h3>Distance: <output></output></h3>
+                        <input type="range" id="detectionDistance" min="1" max="10" value="5" />
+                    </li>
+                </ul>
+            </li>
+            <li>Remove slot cars from track</li>
+            <li><input type="button" id="captureDefault" value="Capture default"
+                    onclick="captureDefault=true;event.target.style.color='#aaaaaa';" /> colors
+                without slot cars</li>
+            <li>Move cars into red detection rectangle and check if rectangle changes color to green. You may want
+                to adjust:
+                <ul>
+                    <li>
+                        <h3>Color Treshold: <output></output></h3>
+                        <input type="range" id="colorThreshold" min="1" max="255" value="40" />
+                    </li>
+                    <li>
+                        <h3>Block size: <output></output></h3>
+                        <input type="range" name="blockSize" min="1" max="10" value="5" />
+                    </li>
+                </ul>
+            </li>
+            <li><input type="button" id="startRace" value="Start race" onclick="startTimekeeping();" /> to start
+                timekeeping!</li>
+        </ol>
+        <video id="video" autoplay playsinline></video>
+    </div>
+    <div id="timekeeperScreen">Time</div>
     <script>
         function setRange(id, value, min, max) {
             let range = document.getElementById(id);
@@ -56,11 +61,14 @@
             range.value = Math.round(value);
         }
 
+        let settingsScreen = document.getElementById("settingsScreen");
+        let timekeeperScreen = document.getElementById("timekeeperScreen");
+
         let canvas = document.getElementById("canvas");
         let video = document.getElementById("video");
         video.width = canvas.width;
         video.height = canvas.height;
-        
+
         let context = document.getElementById("canvas").getContext('2d', { 'willReadFrequently': true });
 
         let adjustColor = getCSSColor([250, 0, 0, .25]);
@@ -173,6 +181,11 @@
                 context.fillStyle = adjustColor;
                 context.fillText(`${framesPerSecond} fps`, 2, 10);
             }
+        }
+
+        function startTimekeeping() {
+            settingsScreen.style.visibility = 'hidden';
+            
         }
     </script>
 </body>

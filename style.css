@@ -10,10 +10,7 @@ canvas {
 }
 
 video {
-    position: absolute;
-    right: 0px;
-    top: 0px;
-    z-index: -1;
+    visibility: hidden;
 }
 
 input[type=range] {
@@ -38,6 +35,11 @@ ol, ul {
     margin-top: 0px;
     margin-bottom: 0px;
 }
+
 ul:nth-child(1) {
     margin-top: 5px;
+}
+
+#timekeeperScreen {
+    visibility: hidden;
 }

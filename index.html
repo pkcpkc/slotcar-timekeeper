@@ -8,8 +8,8 @@
 </head>
 
 <body>
-    <video id="video" autoplay playsinline></video><br />
     <canvas id="canvas"></canvas><br />
+    <video id="video" autoplay playsinline></video>
     <ol>
         <li><input type="button" onclick="startVideo();event.target.style.color='#aaaaaa';" value="Start video" /> and
             allow video capturing</li>
@@ -56,8 +56,11 @@
             range.value = Math.round(value);
         }
 
-        let video = document.getElementById("video");
         let canvas = document.getElementById("canvas");
+        let video = document.getElementById("video");
+        video.width = canvas.width;
+        video.height = canvas.height;
+        
         let context = document.getElementById("canvas").getContext('2d', { 'willReadFrequently': true });
 
         let adjustColor = getCSSColor([250, 0, 0, .25]);

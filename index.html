@@ -96,16 +96,18 @@
             }, true)
         });
 
-        async function startVideo() {
-            video.srcObject = await navigator.mediaDevices.getUserMedia({
-                audio: false,
-                video: {
-                    facingMode: 'environment',
-                    width: canvas.width,
-                    height: canvas.height
-                }
-            });
-            video.requestVideoFrameCallback(captureFrame);
+        function startVideo() {
+            (async () => {
+                video.srcObject = await navigator.mediaDevices.getUserMedia({
+                    audio: false,
+                    video: {
+                        facingMode: 'environment',
+                        width: canvas.width,
+                        height: canvas.height
+                    }
+                });
+                video.requestVideoFrameCallback(captureFrame);
+            })();
         }
 
         function captureFrame() {

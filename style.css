@@ -1,0 +1,42 @@
+body, h3 {
+    font: 14px Arial;
+    margin: 0px;
+}
+
+canvas {
+    width: 100%;
+    height: 33%;
+    border: 1px solid black;
+}
+
+video {
+    width: 100%;
+    height: 33%;
+    display: none;
+}
+
+input[type=range] {
+    width: 70%;
+}
+
+div {
+    display: block;
+    width: 100%;
+}
+
+div>div {
+    width: 14%;
+    display: inline-flex;
+}
+
+input[type=button] {
+    margin: 14px 0px;
+}
+
+ol, ul {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+ul:nth-child(1) {
+    margin-top: 5px;
+}

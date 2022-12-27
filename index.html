@@ -1,132 +1,173 @@
+<!DOCTYPE html>
 <html>
 
 <head>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="style.css" />
+    <script src="color.js"></script>
 </head>
-<style>
-    canvas {
-        width: 100%;
-        height: 33%;
-    }
-    video {
-        width: 100%;
-        height: 33%;
-    }
-</style>
 
 <body>
-    <video id="video" autoplay playsinline></video><br />
+    <video id="video" autoplay playsinline></video>
     <canvas id="canvas"></canvas><br />
-    <input type="button" id="reset" value="Reset" onclick="reset();" /><br />
-    <div id="log"></div>
+    <ol>
+        <li><input type="button" onclick="startVideo();event.target.style.color='#aaaaaa';" value="Start video" /> and
+            allow video capturing</li>
+        <li>Position phone on top of track and capture slot cars in red detection rectangles using:
+            <ul>
+                <li>
+                    <h3>Width: <output></output></h3>
+                    <input type="range" id="detectionWidth" min="1" max="10" value="5" />
+                </li>
+                <li>
+                    <h3>Height: <output></output></h3>
+                    <input type="range" id="detectionHeight" min="1" max="10" value="5" />
+                </li>
+                <li>
+                    <h3>Distance: <output></output></h3>
+                    <input type="range" id="detectionDistance" min="1" max="10" value="5" />
+                </li>
+            </ul>
+        </li>
+        <li>Remove slot cars from track</li>
+        <li><input type="button" id="captureDefault" value="Capture default"
+                onclick="captureDefault=true;event.target.style.color='#aaaaaa';" /> colors
+            without slot cars</li>
+        <li>Move cars into red detection rectangle and check if rectangle changes color to green. You may want
+            to adjust:
+            <ul>
+                <li>
+                    <h3>Color Treshold: <output></output></h3>
+                    <input type="range" id="colorThreshold" min="1" max="255" value="40" />
+                </li>
+                <li>
+                    <h3>Block size: <output></output></h3>
+                    <input type="range" name="blockSize" min="1" max="10" value="5" />
+                </li>
+            </ul>
+        </li>
+        <li><input type="button" id="startRace" value="Start race" onclick="start();" /> to start timekeeping!</li>
+    </ol>
     <script>
-        let context = document.getElementById("canvas").getContext('2d', { 'willReadFrequently': true });
+        function setRange(id, value, min, max) {
+            let range = document.getElementById(id);
+            range.min = Math.round(min);
+            range.max = Math.round(max);
+            range.value = Math.round(value);
+        }
+
         let video = document.getElementById("video");
-        let log = document.getElementById("log");
+        let canvas = document.getElementById("canvas");
+        let context = document.getElementById("canvas").getContext('2d', { 'willReadFrequently': true });
 
-        let width = 320;
-        let height = 240;
-        let splitWidth = width / 5;
-        let splitHeight = height / 4;
-        let blockSize = 5;
-        let rectLeft = { x: splitWidth, y: splitHeight, width: splitWidth, height: height - splitHeight * 2 };
-        let rectRight = { x: splitWidth * 3, y: splitHeight, width: splitWidth, height: height - splitHeight * 2 };
+        let adjustColor = getCSSColor([250, 0, 0, .25]);
+        let detectedColor = getCSSColor([0, 250, 0, 0.5]);
 
-        var defaultColorLeft = [0, 0, 0];
-        var leftActive = false;
-        var countLeft = 0;
-        var defaultColorRight = [0, 0, 0];
-        var rightActive = false;
-        var countRight = 0;
-        var colorThreshold = 40;
+        var rectLeft = { x: 0, y: 0, width: 0, height: 0 };
+        var rectRight = { x: 0, y: 0, width: 0, height: 0 };
+        var averageColorLeft = false;
+        var averageColorRight = false;
 
-        (async () => {
+        var captureDefault = false;
+
+        let settings = {
+            detectionWidth: canvas.width / 6,
+            detectionHeight: canvas.height / 2,
+            detectionDistance: canvas.width / 4,
+            colorThreshold: 40,
+            defaultColorLeft: false,
+            defaultColorRight: false,
+            blockSize: 5
+        };
+
+        let fps = {
+            frameCount: 0,
+            timeMillis: 0
+        };
+
+        setRange('detectionWidth', settings.detectionWidth, 0, canvas.width / 2);
+        setRange('detectionHeight', settings.detectionHeight, 0, canvas.height);
+
+        Array.from(document.querySelectorAll('input[type="range"]')).forEach(input => {
+            input.previousElementSibling.firstElementChild.value = input.value;
+            input.addEventListener('input', function (event) {
+                input.previousElementSibling.firstElementChild.value = input.value;
+                settings[input.id] = parseInt(input.value);
+            }, true)
+        });
+
+        async function startVideo() {
             video.srcObject = await navigator.mediaDevices.getUserMedia({
                 audio: false,
                 video: {
                     facingMode: 'environment',
-                    width: width,
-                    height: height
+                    width: canvas.width,
+                    height: canvas.height
                 }
             });
-            video.requestVideoFrameCallback(screenshot);
-        })();
-
-        function getCSSColor(rgbArray) {
-            return `rgb(${rgbArray[0]},${rgbArray[1]},${rgbArray[2]})`;
+            video.requestVideoFrameCallback(captureFrame);
         }
 
-        function getAverageRGBBlock(imageData, blockSize) {
-            const RGBA_ARRAY_LENGTH = 4;
-            let length = imageData.data.length;
-            let data = imageData.data;
-            var count = 0;
-            var rgb = [0, 0, 0];
-            for (var i = 0; i < length; i += blockSize * RGBA_ARRAY_LENGTH) {
-                count++;
-                rgb[0] += data[i];
-                rgb[1] += data[i + 1];
-                rgb[2] += data[i + 2];
-            }
-            rgb[0] = ~~(rgb[0] / count);
-            rgb[1] = ~~(rgb[1] / count);
-            rgb[2] = ~~(rgb[2] / count);
-            return rgb;
+        function captureFrame() {
+            rectLeft.x = (canvas.width - settings.detectionDistance) / 2 - settings.detectionWidth;
+            rectLeft.y = (canvas.height - settings.detectionHeight) / 2;
+            rectLeft.width = settings.detectionWidth;
+            rectLeft.height = settings.detectionHeight;
+
+            rectRight.x = (canvas.width + settings.detectionDistance) / 2;
+            rectRight.y = (canvas.height - settings.detectionHeight) / 2;
+            rectRight.width = settings.detectionWidth;
+            rectRight.height = settings.detectionHeight;
+
+            context.drawImage(video, 0, 0);
+            averageColorLeft = getAverageRGBwithBlock(context.getImageData(rectLeft.x, rectLeft.y, rectLeft.width, rectLeft.height), settings.blockSize);;
+            averageColorRight = getAverageRGBwithBlock(context.getImageData(rectRight.x, rectRight.y, rectRight.width, rectRight.height), settings.blockSize);
+
+            renderSettings();
+
+            video.requestVideoFrameCallback(captureFrame);
         }
 
-        function getColorLeft() {
-            return getAverageRGBBlock(context.getImageData(rectLeft.x, rectLeft.y, rectLeft.width, rectLeft.height), blockSize);
-        }
+        function renderSettings() {
+            let maxDistance = Math.max(0, canvas.width - settings.detectionWidth * 2);
+            setRange('detectionDistance', Math.min(settings.detectionDistance, maxDistance), 0, maxDistance);
 
-        function getColorRight() {
-            return getAverageRGBBlock(context.getImageData(rectRight.x, rectRight.y, rectRight.width, rectRight.height), blockSize);
-        }
-
-        function screenshot() {
-            context.drawImage(video, rectLeft.x, rectLeft.y, rectLeft.width, rectLeft.height, rectLeft.x, rectLeft.y, rectLeft.width, rectLeft.height);
-            context.drawImage(video, rectRight.x, rectRight.y, rectRight.width, rectRight.height, rectRight.x, rectRight.y, rectRight.width, rectRight.height);
-
-            let colorLeft = getColorLeft();
-            let colorRight = getColorRight();
-
-            let diffLeft = calculateDiff(defaultColorLeft, colorLeft);
-            if (diffLeft > colorThreshold && !leftActive) {
-                leftActive = true;
-                countLeft++;
-                log.innerHTML = `${countLeft} | ${countRight}`;
-            } else if (diffLeft <= colorThreshold) {
-                leftActive = false;
+            // set default detection colors
+            if (captureDefault) {
+                captureDefault = false;
+                settings.defaultColorLeft = averageColorLeft;
+                settings.defaultColorRight = averageColorRight;
             }
 
-            let diffRight = calculateDiff(defaultColorRight, colorRight);
-            if (diffRight > colorThreshold && !rightActive) {
-                rightActive = true;
-                countRight++;
-                log.innerHTML = `${countLeft} | ${countRight}`;
-            } else if (diffRight <= colorThreshold) {
-                rightActive = false;
+            // check if color difference exceeds threshold
+            var drawColorLeft = adjustColor;
+            var drawColorRight = adjustColor;
+            if (settings.defaultColorLeft && settings.defaultColorRight) {
+                if (calculateColorDifference(settings.defaultColorLeft, averageColorLeft) > settings.colorThreshold) {
+                    drawColorLeft = detectedColor;
+                }
+                if (calculateColorDifference(settings.defaultColorRight, averageColorRight) > settings.colorThreshold) {
+                    drawColorRight = detectedColor;
+                }
             }
 
-            context.fillStyle = getCSSColor(colorLeft);
+            // draw detection rectangles
+            context.fillStyle = drawColorLeft;
             context.fillRect(rectLeft.x, rectLeft.y, rectLeft.width, rectLeft.height);
-            context.fillStyle = getCSSColor(colorRight);
+            context.fillStyle = drawColorRight;
             context.fillRect(rectRight.x, rectRight.y, rectRight.width, rectRight.height);
 
-            video.requestVideoFrameCallback(screenshot);
-        }
-
-        function reset() {
-            defaultColorLeft = getColorLeft();
-            defaultColorRight = getColorRight();
-            log.innerHTML = '';
-        }
-
-        function calculateDiff(colorDefault, colorCurrent) {
-            var diff = 0;
-            for (var i = 0; i < colorDefault.length; i++) {
-                diff += Math.abs(colorDefault[i] - colorCurrent[i]);
+            // draw fps
+            let nowMs = new Date().getTime();
+            if (fps.timeMillis == 0) {
+                fps.timeMillis = nowMs;
+                fps.frameCount = 0;
+            } else {
+                fps.frameCount++;
+                let framesPerSecond = Math.round(fps.frameCount / (nowMs - fps.timeMillis) * 1000);
+                context.fillStyle = adjustColor;
+                context.fillText(`${framesPerSecond} fps`, 2, 10);
             }
-            return diff;
         }
     </script>
 </body>

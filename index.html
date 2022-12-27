@@ -121,7 +121,7 @@
             rectRight.width = settings.detectionWidth;
             rectRight.height = settings.detectionHeight;
 
-            context.drawImage(video, 0, 0);
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
             averageColorLeft = getAverageRGBwithBlock(context.getImageData(rectLeft.x, rectLeft.y, rectLeft.width, rectLeft.height), settings.blockSize);;
             averageColorRight = getAverageRGBwithBlock(context.getImageData(rectRight.x, rectRight.y, rectRight.width, rectRight.height), settings.blockSize);
 

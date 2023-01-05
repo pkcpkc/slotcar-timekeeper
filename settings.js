@@ -43,30 +43,6 @@ Array.from(document.querySelectorAll('input[type="range"]')).forEach(input => {
     }, true)
 });
 
-function startVideo() {
-    (async () => {
-        let videoStream = await navigator.mediaDevices.getUserMedia({
-            audio: false,
-            video: {
-                facingMode: 'environment',
-                width: VIDEO_SIZE.width,
-                height: VIDEO_SIZE.height
-            },
-            frameRate: {
-                ideal: 60,
-                min: 30
-            }
-        });
-        videoStream.getTracks()[0].applyConstraints({
-            advanced: [{
-                torch: true
-            }]
-        });
-        video.srcObject = videoStream;
-        video.requestVideoFrameCallback(captureFrame);
-    })();
-}
-
 function captureFrame() {
     rectLeft.x = (canvas.width - settings.detectionDistance) / 2 - settings.detectionWidth;
     rectLeft.y = (canvas.height - settings.detectionHeight) / 2;

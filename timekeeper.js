@@ -1,4 +1,4 @@
-const MIN_TIME_DIFFERENCE_MS = 2000;
+const MIN_TIME_DIFFERENCE_MS = 1000;
 
 // timekeeper for car 0 and 1
 let timekeeper = [[], []];

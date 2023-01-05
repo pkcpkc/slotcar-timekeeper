@@ -62,13 +62,17 @@
         <input type="button" value="Restart" onclick="window.location.reload();" /><br />
         <div>
             <b>Laps: <span class="laps"></span></b><br />
-            <b>Best Lap: <span class="bestLap"></span></b><br /><br />
+            <b>Total time: <span class="totalTime"></span></b><br />
+            <b>Lap average: <span class="lapAverage"></span></b><br />
+            <b>Best lap: <span class="bestLap"></span></b><br /><br />
             <ol class="lapTimes">
             </ol>
         </div>
         <div>
             <b>Laps: <span class="laps"></span></b><br />
-            <b>Best Lap: <span class="bestLap"></span></b><br /><br />
+            <b>Total time: <span class="totalTime"></span></b><br />
+            <b>Lap average: <span class="lapAverage"></span></b><br />
+            <b>Best lap: <span class="bestLap"></span></b><br /><br />
             <ol class="lapTimes">
             </ol>
         </div>
@@ -113,12 +117,7 @@
             }, 5000);
         }
 
-        function setRange(id, value, min, max) {
-            let range = document.getElementById(id);
-            range.min = Math.round(min);
-            range.max = Math.round(max);
-            range.value = Math.round(value);
-        }
+
     </script>
     <script src="settings.js"></script>
     <script src="timekeeper.js"></script>

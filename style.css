@@ -3,12 +3,6 @@ body, h3 {
     margin: 0px;
 }
 
-body > div {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-}
-
 canvas {
     width: 100%;
     height: 33%;
@@ -16,7 +10,10 @@ canvas {
 }
 
 video {
-    visibility: hidden;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: -1;
 }
 
 input[type=range] {
@@ -45,10 +42,6 @@ ul:nth-child(1) {
     margin-top: 5px;
 }
 
-#settingsScreen {
-    visibility: visible;
-}
-
-#timekeeperScreen {
-    visibility: hidden;
+.screen {
+    display: none;
 }

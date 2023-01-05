@@ -12,9 +12,9 @@ var averageColorRight = false;
 var captureDefault = false;
 
 let settings = {
-    detectionWidth: canvas.width / 6,
-    detectionHeight: canvas.height / 2,
-    detectionDistance: canvas.width / 4,
+    detectionWidth: 110,
+    detectionHeight: 110,
+    detectionDistance: 70,
     colorThreshold: 40,
     defaultColorLeft: false,
     defaultColorRight: false,
@@ -45,7 +45,7 @@ Array.from(document.querySelectorAll('input[type="range"]')).forEach(input => {
 
 function startVideo() {
     (async () => {
-        video.srcObject = await navigator.mediaDevices.getUserMedia({
+        let videoStream = await navigator.mediaDevices.getUserMedia({
             audio: false,
             video: {
                 facingMode: 'environment',
@@ -57,6 +57,12 @@ function startVideo() {
                 min: 30
             }
         });
+        videoStream.getTracks()[0].applyConstraints({
+            advanced: [{
+                torch: true
+            }]
+        });
+        video.srcObject = videoStream;
         video.requestVideoFrameCallback(captureFrame);
     })();
 }

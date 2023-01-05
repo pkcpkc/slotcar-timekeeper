@@ -1,12 +1,14 @@
-body, h3 {
+body,
+h3 {
     font: 14px Arial;
-    margin: 0px;
+    margin: 3px;
 }
 
+video,
 canvas {
-    width: 100%;
-    height: 33%;
-    border: 1px solid black;
+    width: 300px;
+    height: 150px;
+    margin: -3px;
 }
 
 video {
@@ -14,6 +16,10 @@ video {
     left: 0px;
     top: 0px;
     z-index: -1;
+}
+
+canvas {
+    border: 1px solid black;
 }
 
 input[type=range] {
@@ -24,16 +30,12 @@ div {
     width: 100%;
 }
 
-div>div {
-    width: 14%;
-    display: inline-flex;
-}
-
 input[type=button] {
     margin: 14px 0px;
 }
 
-ol, ul {
+ol,
+ul {
     margin-top: 0px;
     margin-bottom: 0px;
 }
@@ -44,4 +46,10 @@ ul:nth-child(1) {
 
 .screen {
     display: none;
+}
+
+#timekeeper > div {
+    width: 50%;
+    
+    float: left;
 }

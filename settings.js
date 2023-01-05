@@ -69,10 +69,10 @@ function captureFrame() {
 
     if (screens[SCREENS.TIMEKEEPER].style.display != 'none') {
         if (calculateColorDifference(settings.defaultColorLeft, averageColorLeft) > settings.colorThreshold) {
-            detectCar(true);
+            detectCar(0);
         }
         if (calculateColorDifference(settings.defaultColorRight, averageColorRight) > settings.colorThreshold) {
-            detectCar(false);
+            detectCar(1);
         }
     }
 

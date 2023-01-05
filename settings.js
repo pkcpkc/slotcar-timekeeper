@@ -1,4 +1,5 @@
 let context = document.getElementById("canvas").getContext('2d', { 'willReadFrequently': true });
+let VIDEO_SIZE = { 'width': 1024, 'height': 768 };
 
 let adjustColor = getCSSColor([250, 0, 0, .25]);
 let detectedColor = getCSSColor([0, 250, 0, 0.8]);
@@ -25,6 +26,12 @@ let fps = {
     timeMillis: 0
 };
 
+function setRange(id, value, min, max) {
+    let range = document.getElementById(id);
+    range.min = Math.max(1, Math.round(min));
+    range.max = Math.round(max);
+    range.value = Math.round(value);
+}
 setRange('detectionWidth', settings.detectionWidth, 0, canvas.width / 2);
 setRange('detectionHeight', settings.detectionHeight, 0, canvas.height);
 
@@ -42,8 +49,12 @@ function startVideo() {
             audio: false,
             video: {
                 facingMode: 'environment',
-                width: canvas.width,
-                height: canvas.height
+                width: VIDEO_SIZE.width,
+                height: VIDEO_SIZE.height
+            },
+            frameRate: {
+                ideal: 60,
+                min: 30
             }
         });
         video.requestVideoFrameCallback(captureFrame);

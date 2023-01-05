@@ -8,8 +8,8 @@
 </head>
 
 <body>
+    <canvas id="canvas"></canvas>
     <div id="settingsScreen">
-        <canvas id="canvas"></canvas><br />
         <ol>
             <li><input type="button" onclick="startVideo();event.target.style.color='#aaaaaa';" value="Start video" />
                 and
@@ -52,7 +52,8 @@
         </ol>
         <video id="video" autoplay playsinline></video>
     </div>
-    <div id="timekeeperScreen">Time</div>
+    <div id="timekeeperScreen">
+    </div>
     <script>
         function setRange(id, value, min, max) {
             let range = document.getElementById(id);
@@ -63,6 +64,7 @@
 
         let settingsScreen = document.getElementById("settingsScreen");
         let timekeeperScreen = document.getElementById("timekeeperScreen");
+        var currentScreen = settingsScreen;
 
         let canvas = document.getElementById("canvas");
         let video = document.getElementById("video");
@@ -138,6 +140,15 @@
 
             renderSettings();
 
+            if (currentScreen == timekeeperScreen) {
+                if (calculateColorDifference(settings.defaultColorLeft, averageColorLeft) > settings.colorThreshold) {
+                    detectCar(true);
+                }
+                if (calculateColorDifference(settings.defaultColorRight, averageColorRight) > settings.colorThreshold) {
+                    detectCar(false);
+                }
+            }
+
             video.requestVideoFrameCallback(captureFrame);
         }
 
@@ -184,9 +195,53 @@
         }
 
         function startTimekeeping() {
+            let startTime = new Date().getTime();
+            timekeeper.left.push(startTime);
+            timekeeper.right.push(startTime);
+            currentScreen = timekeeperScreen;
             settingsScreen.style.visibility = 'hidden';
-            
+            timekeeperScreen.style.visibility = 'visible';
         }
+
+        function padTo2Digits(num) {
+            return num.toString().padStart(2, '0');
+        }
+
+        function convertMsToMinutesSeconds(milliseconds) {
+            const minutes = Math.floor(milliseconds / 60000);
+            const seconds = Math.round((milliseconds % 60000) / 1000);
+
+            return seconds === 60
+                ? `${minutes + 1}:00`
+                : `${minutes}:${padTo2Digits(seconds)}`;
+        }
+
+        function detectCar(leftCar) {
+            const MIN_TIME_DIFFERENCE_MS = 2000;
+            let now = new Date().getTime();
+            var side = leftCar ? timekeeper.left : timekeeper.right;
+            var timeDifference = now - side[side.length - 1];
+            if (timeDifference > MIN_TIME_DIFFERENCE_MS) {
+                side.push(now);
+            }
+
+            var timesLeft = [];
+            for (var i = 1; i < timekeeper.left.length; i++) {
+                timesLeft.push(timekeeper.left[i] - timekeeper.left[i - 1]);
+            }
+
+            var timesRight = [];
+            for (var i = 1; i < timekeeper.right.length; i++) {
+                timesRight.push(timekeeper.right[i] - timekeeper.right[i - 1]);
+            }
+
+            timekeeperScreen.innerHTML = timesLeft.join(",") + '<br/>' + timesRight.join(",");
+        }
+
+        var timekeeper = { // todo: just remember start time of last lap - and render result already in array!
+            left: [],
+            right: []
+        };
     </script>
 </body>
 

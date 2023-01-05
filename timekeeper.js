@@ -3,17 +3,23 @@ const MIN_TIME_DIFFERENCE_MS = 2000;
 // timekeeper for car 0 and 1
 let timekeeper = [[], []];
 
-let timetable = [
-    getTimetableFields(0),
-    getTimetableFields(1),
-];
 
-function getTimetableFields(index) {
-    return {
-        'laps': document.querySelector(`#timekeeper div:nth-child(${index + 1}) span.laps`),
-        'bestLap': document.querySelector(`#timekeeper div:nth-child(${index + 1}) span.bestLap`),
-        'lapTimes': document.querySelector(`#timekeeper div:nth-child(${index + 1}) ol.lapTimes`)
+let timetable = getTimetableFields();
+
+function getTimetableFields() {
+    let laps = document.querySelectorAll('#timekeeper .laps');
+    let bestLap = document.querySelectorAll('#timekeeper .bestLap');
+    let lapTimes = document.querySelectorAll('#timekeeper .lapTimes');
+
+    let timetable = [];
+    for (var i = 0; i < laps.length; i++) {
+        timetable.push({
+            'laps': laps[i],
+            'bestLap': bestLap[i],
+            'lapTimes': lapTimes[i]
+        });
     }
+    return timetable;
 }
 
 function formatMillis(millis) {

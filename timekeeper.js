@@ -1,18 +1,17 @@
+let laps = document.querySelectorAll('#timekeeper .laps');
+let bestLaps = document.querySelectorAll('#timekeeper .bestLap');
+let lapTimes = document.querySelectorAll('#timekeeper .lapTimes');
+let totalTimes = document.querySelectorAll('#timekeeper .totalTime');
+let lapAverages = document.querySelectorAll('#timekeeper .lapAverage');
+
 const MIN_TIME_DIFFERENCE_MS = 1000;
 
 // timekeeper for car 0 and 1
 let timekeeper = [[], []];
-
-
 let timetable = getTimetableFields();
+var timekeeping = true;
 
 function getTimetableFields() {
-    let laps = document.querySelectorAll('#timekeeper .laps');
-    let bestLaps = document.querySelectorAll('#timekeeper .bestLap');
-    let lapTimes = document.querySelectorAll('#timekeeper .lapTimes');
-    let totalTimes = document.querySelectorAll('#timekeeper .totalTime');
-    let lapAverages = document.querySelectorAll('#timekeeper .lapAverage');
-
     let timetable = [];
     for (var i = 0; i < laps.length; i++) {
         timetable.push({
@@ -32,7 +31,31 @@ function formatMillis(millis) {
     return `${seconds}s ${remainingMillis}ms`;
 }
 
+function resetTimekeeper() {
+    stopTimekeeper();
+    for (var i = 0; i < laps.length; i++) {
+        laps[i].innerHTML = '-';
+        bestLaps[i].innerHTML = '-';
+        totalTimes[i].innerHTML = '-';
+        lapAverages[i].innerHTML = '-';
+        while (lapTimes[i].lastElementChild) {
+            lapTimes[i].removeChild(lapTimes[i].lastElementChild);
+        }
+    }
+    let startTime = new Date().getTime();
+    timekeeper[0] = [startTime];
+    timekeeper[1] = [startTime];
+    timekeeping = true;
+}
+
+function stopTimekeeper() {
+    timekeeping = false;
+}
+
 function detectCar(carId) {
+    if (!timekeeping) {
+        return;
+    }
     let now = new Date().getTime();
     var timeDifference = now - timekeeper[carId][timekeeper[carId].length - 1];
 

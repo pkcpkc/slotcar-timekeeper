@@ -59,7 +59,8 @@
         Back to <a href="#" onclick="showScreen(SCREENS.QUICK_START);">Quick Start</a>
     </div>
     <div id="timekeeper" class="screen">
-        <input type="button" value="Restart" onclick="window.location.reload();" /><br />
+        <input type="button" value="Stop" onclick="stopTimekeeper();" /> <input type="button" value="Reset"
+            onclick="resetTimekeeper();" /> <a href="#" onclick="window.location.reload();">Back</a><br />
         <div>
             <b>Laps: <span class="laps"></span></b><br />
             <b>Total time: <span class="totalTime"></span></b><br />
@@ -112,7 +113,6 @@
         }
 
         function startVideo() {
-
             (async () => {
                 let videoStream = await navigator.mediaDevices.getUserMedia({
                     audio: false,
@@ -132,9 +132,7 @@
         }
 
         function startTimekeeping() {
-            let startTime = new Date().getTime();
-            timekeeper[0] = [startTime];
-            timekeeper[1] = [startTime];
+            resetTimekeeper();
             showScreen(SCREENS.TIMEKEEPER);
         }
     </script>

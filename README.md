@@ -9,6 +9,10 @@ The solutions available are either very costly, over-complicated or both:
 * [Carrera Electric Round Counter](https://carrera-toys.com/product/20071590-elektronischer-rundenzahler-goevolution) 74,99€
 * [SmartRace](https://www.smartrace.de/) costing 12,99€ plus 2,99€ for the server app PLUS needs two iOS devices!
 
+## Development
+
+If you want to read the full story, I wrote a little article on Medium: [Developing a slot car timekeeper app, using a cardboard, mobile phone and web technologies only](https://medium.com/axel-springer-tech/developing-a-slot-car-timekeeper-app-using-a-cardboard-mobile-phone-and-web-technologies-only-9fff783d1afe)
+
 ## Concept
 
 I love the bootstrapped, low-tech approach of the [Google Cardbard](https://arvr.google.com/cardboard/) providing AR experiences for anybody with a decent mobile. Our mobiles offer crazy capabilities:
@@ -27,10 +31,6 @@ The mobile can detect the cars, display the laps, times and winner all in one de
 
 Additional no additional plastic waste or money goes down the sink...
 
-## Progress
-
-Currently it's just a peak implementation, but seems to be feasable.
-
-## Preview
+## Give it a shot
 
 Check it out: [Slotcar Timekeeper](https://pkcpkc.github.io/slotcar-timekeeper/)
